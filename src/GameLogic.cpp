@@ -47,7 +47,7 @@ void appStart(sf::RenderWindow& appwindow) {
 
 	for(int i = 0; i < W; ++i)
 		for (int j = 0; j < W; ++j) {
-			int cap = rngesus(16, 16);
+			int cap = rngesus(8, 16);
 			for (int k = 0; k < cap; ++k)
 				world.modify_block_type(i, k, j, 1);
 	}
@@ -162,6 +162,7 @@ void add_triangle_3d(Point3 a, Point3 b, Point3 c, sf::Color color) {
 }
 
 Point3 externalTransform(Point3 p) {
+	// translation
 	p -= player_pos;
 	// yaw transform
 	Point3 u(p.x * cos(yaw) - p.z * sin(yaw), p.y, p.z * cos(yaw) + p.x * sin(yaw));
@@ -197,7 +198,6 @@ void draw_cube(Point3 bruh) {
 		vertex[i] = externalTransform(vertex[i]);
 	}
 
-
 	// dot product < 0 means visible. That's how geometry work I think
 	Point3 normal[6] = {Point3(0, -1, 0), Point3(0, 1, 0) ,
 						Point3(-1, 0, 0), Point3(1, 0, 0) ,
@@ -219,8 +219,15 @@ void draw_cube(Point3 bruh) {
 
 		float light_intensity = dotProduct(light_cast, normal[f]);
 		float brightness = 140 - light_intensity * 40;
+		//float brightness = 140;
 		sf::Color cur = sf::Color(brightness, brightness, brightness);
 		sf::Color debug_color = sf::Color(brightness, brightness, 0);
+
+		if (int(bruh.x + bruh.y + bruh.z) % 2)
+			cur.r *= 0.9;
+		else
+			cur.g *= 0.9;
+
 
 		Point3 diff = bruh - player_pos + normal[f] * 0.5f;
 		if (dotProduct(diff, normal[f]) < 0) {
@@ -318,7 +325,6 @@ void appLoop(sf::RenderWindow& appwindow, float delta) {
 		return std::abs(player_pos.z - a) > std::abs(player_pos.z - b);
 		});
 
-	std::cerr << "Frame\n";
 	for (int i: orderX)
 		for (int j: orderY)
 			for (int k: orderZ) 
